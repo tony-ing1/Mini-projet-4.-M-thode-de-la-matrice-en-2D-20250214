@@ -32,8 +32,7 @@ h=1; #W/(m^2*K); Coefficient de transfert thermique sur les surfaces extérieure
 # Paramètres de l'air qui remplit l'appartement
 ka=0.024;
 
-# fact_ar = np.array([2.0, 1.0, 0.5, 0.25], dtype=np.double); # Matrice pleine
-fact_ar = np.array([.5])
+fact_ar = np.array([1.0, 0.5, 0.25], dtype=np.double); # Matrice pleine , 0.125, 0.0625 fact_ar = np.array([.5])
 d_ar=np.zeros(fact_ar.size,dtype=np.double);
 tini_ar=np.zeros(fact_ar.size,dtype=np.double);
 tinv_ar=np.zeros(fact_ar.size,dtype=np.double);
