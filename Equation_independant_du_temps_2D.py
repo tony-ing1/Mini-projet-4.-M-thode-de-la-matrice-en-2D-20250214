@@ -32,7 +32,8 @@ h=1; #W/(m^2*K); Coefficient de transfert thermique sur les surfaces extérieure
 # Paramètres de l'air qui remplit l'appartement
 ka=0.024;
 
-fact_ar = np.array([2.0, 1.0, 0.5, 0.25], dtype=np.double); # Matrice pleine
+# fact_ar = np.array([2.0, 1.0, 0.5, 0.25], dtype=np.double); # Matrice pleine
+fact_ar = np.array([.5])
 d_ar=np.zeros(fact_ar.size,dtype=np.double);
 tini_ar=np.zeros(fact_ar.size,dtype=np.double);
 tinv_ar=np.zeros(fact_ar.size,dtype=np.double);
@@ -40,6 +41,9 @@ mem_ar=np.zeros(fact_ar.size,dtype=np.double);
 Tm_ar=np.zeros(fact_ar.size,dtype=np.double);
 Err_ar=np.zeros(fact_ar.size-1,dtype=np.double);
 d_Err_ar=np.zeros(fact_ar.size-1,dtype=np.double);
+
+
+                    
 
 ci=-1;
 for fact in fact_ar:
@@ -50,9 +54,7 @@ for fact in fact_ar:
     Nx=int(np.rint(Lx/d+1)); # Nombre de nœuds le long de X
     Ny=int(np.rint(Ly/d+1)); # Nombre de nœuds le long de Y
     
-    
     tic=time.time_ns();
-    
     # Initialisation de la source de chaleur, de la conductivité thermique et de la matrice
     S=np.zeros((Ny,Nx),dtype=np.double);
     k=np.zeros((Ny,Nx),dtype=np.double);
@@ -94,7 +96,7 @@ for fact in fact_ar:
         for j in np.arange(1,Nx+1,1):
             # remplir la ligne pl de la matrice M
             pl=(i-1)*Nx+j;
-            
+            # print(i,j)
             if (((i>1) and (i<Ny)) and ((j>1) and (j<Nx))):
                 # noeud qui est strictement à l'intérieur de la cellule de simulation
                 pc=pl;M[pl-1,pc-1]=-4; # contribution de noeud (i,j)
@@ -103,14 +105,54 @@ for fact in fact_ar:
                 pc=(i-2)*Nx+j;M[pl-1,pc-1]=1; # contribution de noeud (i-1,j)
                 pc=(i)*Nx+j;M[pl-1,pc-1]=1; # contribution de noeud (i+1,j)
                 b[pl-1]=-d**2*S[i-1,j-1]/k[i-1,j-1];
+                            # ######JAI MODIFIER ICI (Debut)
+                            # ######JAI MODIFIER ICI (Debut)
+                            # ######JAI MODIFIER ICI (Debut)
+                # if (j == int(Lm/d)) and ((int(Lm/d) < i) and (i < Ny - int(Lm/d))):
+                #     pc=pl;M[pl-1,pc-1]=-(km+ka); # contribution de noeud (i,j)
+                #     pc=(i-1)*Nx+j-1;M[pl-1,pc-1]=km; # contribution de noeud (i,j-1)
+                #     pc=(i-1)*Nx+j+1;M[pl-1,pc-1]=ka; # contribution de noeud (i,j+1)
+                # if j == Nx-int((Lm/d)) and ((int(Lm/d) < i) and (i < Ny - int(Lm/d))):
+                #     pc=pl;M[pl-1,pc-1]=-(km+ka); # contribution de noeud (i,j)
+                #     pc=(i-1)*Nx+j-1;M[pl-1,pc-1]=ka; # contribution de noeud (i,j-1)
+                #     pc=(i-1)*Nx+j+1;M[pl-1,pc-1]=km; # contribution de noeud (i,j+1)
+                    
+                # if (i == int(Lm/d)) and ((int(Lm/d) < j) and (j < Ny - int(Lm/d))):
+                #     pc=pl;M[pl-1,pc-1]=-(km+ka); # contribution de noeud (i,j)
+                #     pc=(i-2)*Nx+j;M[pl-1,pc-1]=km; # contribution de noeud (i-1,j)
+                #     pc=(i)*Nx+j;M[pl-1,pc-1]=ka; # contribution de noeud (i+1,j)
+                # if (i == Ny-int(Lm/d)) and ((int(Lm/d) < j) and (j < Ny - int(Lm/d))):
+                #     pc=pl;M[pl-1,pc-1]=-(km+ka); # contribution de noeud (i,j)
+                #     pc=(i-2)*Nx+j;M[pl-1,pc-1]=ka; # contribution de noeud (i-1,j)
+                #     pc=(i)*Nx+j;M[pl-1,pc-1]= km; # contribution de noeud (i+1,j)
+                            # ######JAI MODIFIER ICI  (fifn)
+                            # ######JAI MODIFIER ICI  (fifn)
+                            # ######JAI MODIFIER ICI  (fifn)
+##################Jai modifier ici (Debut)
+##################Jai modifier ici (Debut)
+##################Jai modifier ici (Debut)
             elif (i==1):
                 # noeud sur le plafond y=0
-                pc=pl;M[pl-1,pc-1]=1; # contribution de noeud (1,j)
-                b[pl-1]=Tp;
+                # pc=pl;M[pl-1,pc-1]=1; # contribution de noeud (1,j)
+                # b[pl-1]=Tp;
+                pc=pl;M[pl-1,pc-1]=3+2*d*h/k[i-1,j-1]; # contribution de noeud (i,1)
+                pc=(i-1)*Ny+j+1;M[pl-1,pc-1]=-4; # contribution de noeud (i,2)
+                pc=(i-1)*Ny+j+2;M[pl-1,pc-1]=1; # contribution de noeud (i,3)
+                b[pl-1]=2*d*h*Tp/k[i-1,j-1];
+
+                
             elif (i==Ny):
                 # noeud sur le plancher y=Ly
-                pc=pl;M[pl-1,pc-1]=1; # contribution de noeud (Ny,j)
-                b[pl-1]=Tp;
+                # pc=pl;M[pl-1,pc-1]=1; # contribution de noeud (Ny,j)
+                # b[pl-1]=Tp;
+                pc=pl;M[pl-1,pc-1]=3+2*d*h/k[i-1,j-1]; # contribution de noeud (i,Ny)
+                pc=(i-1)*Ny+j-1;M[pl-1,pc-1]=-4; # contribution de noeud (i,Ny-1)
+                pc=(i-1)*Ny+j-2;M[pl-1,pc-1]=1; # contribution de noeud (i,Ny-2)
+                b[pl-1]=2*d*h*Tp/k[i-1,j-1];
+
+##################Jai modifier ici (Fin)
+##################Jai modifier ici (Fin)
+##################Jai modifier ici (Fin)
             elif (j==1):
                 # noeud à la surface externe du mur x=0
                 pc=pl;M[pl-1,pc-1]=3+2*d*h/k[i-1,j-1]; # contribution de noeud (i,1)
@@ -123,8 +165,33 @@ for fact in fact_ar:
                 pc=(i-1)*Nx+j-1;M[pl-1,pc-1]=-4; # contribution de noeud (i,Nx-1)
                 pc=(i-1)*Nx+j-2;M[pl-1,pc-1]=1; # contribution de noeud (i,Nx-2)
                 b[pl-1]=2*d*h*Ta/k[i-1,j-1];
+
+                # b[pl-1]=0;
+                
+                
+            ######Jai deplacer cette boucle
+            ######Jai deplacer cette boucle
+            ######Jai deplacer cette boucle
+
+            #if int(Lm / d) <= j <= int((Lx - Lm) / d) and (i == int(Lm / d) ):
+            #     pc=pl;M[pl-1,pc-1]=3+2*d*h/k[i-1,j-1]; # contribution de noeud (i,Nx)
+            #     pc=(i-1)*Nx+j-1;M[pl-1,pc-1]=-4; # contribution de noeud (i,Nx-1)
+            #     pc=(i-1)*Nx+j-2;M[pl-1,pc-1]=1; # contribution de noeud (i,Nx-2)
+            #     b[pl-1]=2*d*h*Ta/k[i-1,j-1];
+                
+                
+            #     M[pl, pl] = km / (ka + km)
+            #     M[pl, pl + Nx ] = -ka / (ka + km)
+            #     b[pl] = 0
+            # if int(Lm / d) <= j <= int((Lx - Lm) / d) and i == int((Ly - Lm) / d):
+                
+                
+            #     M[pl, pl] = km / (ka + km)
+            #     M[pl, pl - Nx ] = -ka / (ka + km)
+            #     b[pl] = 0 
             else:
                 print('Erreur dans la définition de la matrice de coefficients');
+                print(i,j)
 
     toc=time.time_ns();
     tini_ar[ci]=(toc-tic)/1.0e9; #temps en [s]  
