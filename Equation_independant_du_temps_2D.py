@@ -107,23 +107,24 @@ for fact in fact_ar:
                             # ######JAI MODIFIER ICI (Debut)
                             # ######JAI MODIFIER ICI (Debut)
                             # ######JAI MODIFIER ICI (Debut)
-                # if (j == int(Lm/d)) and ((int(Lm/d) < i) and (i < Ny - int(Lm/d))):
-                #     pc=pl;M[pl-1,pc-1]=-(km+ka); # contribution de noeud (i,j)
-                #     pc=(i-1)*Nx+j-1;M[pl-1,pc-1]=km; # contribution de noeud (i,j-1)
-                #     pc=(i-1)*Nx+j+1;M[pl-1,pc-1]=ka; # contribution de noeud (i,j+1)
-                # if j == Nx-int((Lm/d)) and ((int(Lm/d) < i) and (i < Ny - int(Lm/d))):
-                #     pc=pl;M[pl-1,pc-1]=-(km+ka); # contribution de noeud (i,j)
-                #     pc=(i-1)*Nx+j-1;M[pl-1,pc-1]=ka; # contribution de noeud (i,j-1)
-                #     pc=(i-1)*Nx+j+1;M[pl-1,pc-1]=km; # contribution de noeud (i,j+1)
+                    #Contion du flux de chaleur sur la surfaces intérieures à x = Lm
+                if (j== round(Lm/d)) and ((i >= round(Lm/d)) and (i< Ny-round(Lm/d))): #mettre une incertitude pour qu'il soit plus ou moins proche a une longueur de pas
+                     pc=pl;M[pl-1,pc-1]=-(km+ka); # contribution de noeud (i,j)
+                     pc=(i-1)*Nx+j-1;M[pl-1,pc-1]=km; # contribution de noeud (i,j-1)
+                     pc=(i-1)*Nx+j+1;M[pl-1,pc-1]=ka; # contribution de noeud (i,j+1)
+                if (j == Nx-round(Lm/d)) and ((i > round(Lm/d)) and (i <= Ny-round(Lm/d))):
+                     pc=pl;M[pl-1,pc-1]=-(km+ka); # contribution de noeud (i,j)
+                     pc=(i-1)*Nx+j-1;M[pl-1,pc-1]=ka; # contribution de noeud (i,j-1)
+                     pc=(i-1)*Nx+j+1;M[pl-1,pc-1]=km; # contribution de noeud (i,j+1)
                     
-                # if (i == int(Lm/d)) and ((int(Lm/d) < j) and (j < Ny - int(Lm/d))):
-                #     pc=pl;M[pl-1,pc-1]=-(km+ka); # contribution de noeud (i,j)
-                #     pc=(i-2)*Nx+j;M[pl-1,pc-1]=km; # contribution de noeud (i-1,j)
-                #     pc=(i)*Nx+j;M[pl-1,pc-1]=ka; # contribution de noeud (i+1,j)
-                # if (i == Ny-int(Lm/d)) and ((int(Lm/d) < j) and (j < Ny - int(Lm/d))):
-                #     pc=pl;M[pl-1,pc-1]=-(km+ka); # contribution de noeud (i,j)
-                #     pc=(i-2)*Nx+j;M[pl-1,pc-1]=ka; # contribution de noeud (i-1,j)
-                #     pc=(i)*Nx+j;M[pl-1,pc-1]= km; # contribution de noeud (i+1,j)
+                if (i == round(Lm/d)) and ((j >= round(Lm/d)) and (j < Ny - round(Lm/d))):
+                     pc=pl;M[pl-1,pc-1]=-(km+ka); # contribution de noeud (i,j)
+                     pc=(i-2)*Nx+j;M[pl-1,pc-1]=km; # contribution de noeud (i-1,j)
+                     pc=(i)*Nx+j;M[pl-1,pc-1]=ka; # contribution de noeud (i+1,j)
+                if (i == Ny-round(Lm/d)) and ((j > round(Lm/d)) and (j <= Ny - round(Lm/d))):
+                     pc=pl;M[pl-1,pc-1]=-(km+ka); # contribution de noeud (i,j)
+                     pc=(i-2)*Nx+j;M[pl-1,pc-1]=ka; # contribution de noeud (i-1,j)
+                     pc=(i)*Nx+j;M[pl-1,pc-1]= km; # contribution de noeud (i+1,j)
                             # ######JAI MODIFIER ICI  (fifn)
                             # ######JAI MODIFIER ICI  (fifn)
                             # ######JAI MODIFIER ICI  (fifn)
@@ -166,7 +167,8 @@ for fact in fact_ar:
                 b[pl-1]=2*d*h*Ta/k[i-1,j-1];
 
                 # b[pl-1]=0;
-                
+
+                #Contion du flux de chaleur sur la surfaces intérieures à x = Lm
                 
             ######Jai deplacer cette boucle
             ######Jai deplacer cette boucle
