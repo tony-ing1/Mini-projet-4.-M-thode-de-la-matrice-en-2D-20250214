@@ -1,6 +1,7 @@
 import time
 import numpy as np
 import matplotlib.pyplot as plt
+import scipy
 
 # Distribution de la température dans un appartement d'un immeuble aux plusieurs étages
 
@@ -18,7 +19,7 @@ Ta=-20; #oC
 
 # (2) Condition de Dirichlet sur le plafond et sur le plancher
 # T(x, y=0 ou y=Ly)=Tp
-Tp=20; #oC
+Tp=0; #oC
 
 # Dimensions d'appartement
 Lx=4; #[m]
@@ -32,7 +33,7 @@ h=10; #W/(m^2*K); Coefficient de transfert thermique sur les surfaces extérieur
 # Paramètres de l'air qui remplit l'appartement
 ka=0.024
 
-fact_ar = np.array([1.0, 0.5, 0.25], dtype=np.double); # Matrice pleine , 0.25, 0.125, 0.0625 fact_ar = np.array([.5])
+fact_ar = np.array([1.0, 0.5, 0.25, 0.125, 0.0625], dtype=np.double); # Matrice pleine , 0.25, 0.125, 0.0625 fact_ar = np.array([.5])
 d_ar=np.zeros(fact_ar.size,dtype=np.double)
 tini_ar=np.zeros(fact_ar.size,dtype=np.double)
 tinv_ar=np.zeros(fact_ar.size,dtype=np.double)
@@ -49,12 +50,12 @@ for fact in fact_ar:
     ci=ci+1
     d=0.1*fact;    #Pas de discrétisation en [m]
     print('Pas de discritization dx=dy=',d,'m')
-    print("L'indice du mur Lm/d", round(Lm/d))
+    #print("L'indice du mur Lm/d", round(Lm/d))
     d_ar[ci]=d
     Nx=int(np.rint(Lx/d+1)); # Nombre de nœuds le long de X
     Ny=int(np.rint(Ly/d+1)); # Nombre de nœuds le long de Y
     
-    print("Valeur de Nx",Nx, "Valeur de Ny", Ny)
+    #print("Valeur de Nx",Nx, "Valeur de Ny", Ny)
 
     tic=time.time_ns()
     # Initialisation de la source de chaleur, de la conductivité thermique et de la matrice
@@ -89,7 +90,10 @@ for fact in fact_ar:
                 # À l'intérieurde de l'appartement
                 k[i-1,j-1]=ka
        
-    M=np.zeros((Nx*Ny,Nx*Ny),dtype=np.double)
+    #M=np.zeros((Nx*Ny,Nx*Ny),dtype=np.double)
+    #M=scipy.sparse.csr_matrix((Nx*Ny,Nx*Ny), dtype=np.double)
+    M = scipy.sparse.lil_matrix((Nx * Ny, Nx * Ny), dtype=np.double)
+
     b=np.zeros((Nx*Ny,1),dtype=np.double)
     T=np.zeros((Nx*Ny,1),dtype=np.double)
     Tr=np.zeros((Ny,Nx),dtype=np.double)
@@ -119,28 +123,35 @@ for fact in fact_ar:
                     #Contion du flux de chaleur sur la surfaces intérieures à x = Lm
                 if (j== j_mur) and ( i_mur< i< Ny-i_mur):
                     #print("1er valeur de ij",'i=',i,'j=',j)
-                    pc=pl;M[pl-1,pc-1]=-2*(km+ka); # contribution de noeud (i,j)
-                    pc=(i-1)*Nx+j-1;M[pl-1,pc-1]=-km; # contribution de noeud (i,j-1)
+                    pc=pl;M[pl-1,pc-1]=-4*(km+ka); # contribution de noeud (i,j)
+                    pc=(i-1)*Nx+j-1;M[pl-1,pc-1]=km; # contribution de noeud (i,j-1)
                     pc=(i-1)*Nx+j+1;M[pl-1,pc-1]=ka; # contribution de noeud (i,j+1)
+                    #pc=(i-2)*Nx+j;M[pl-1,pc-1]=(km+ka)/2; # contribution de noeud (i-1,j)
+                    #pc=(i)*Nx+j;M[pl-1,pc-1]=(km+ka)/2; # contribution de noeud (i+1,j)
+                    b[pl-1]=Tp
                 
                     #Contion du flux de chaleur sur la surfaces intérieures à x = Lx-Lm
                 if (j == Nx-j_mur) and ( Ny-i_mur> i > i_mur):
                     #print("2e valeur de ij",'i=',i,'j=',j)
-                    pc=pl;M[pl-1,pc-1]=-2*(km+ka); # contribution de noeud (i,j)
+                    pc=pl;M[pl-1,pc-1]=-4*(km+ka); # contribution de noeud (i,j)
                     pc=(i-1)*Nx+j-1;M[pl-1,pc-1]=ka; # contribution de noeud (i,j-1)
-                    pc=(i-1)*Nx+j+1;M[pl-1,pc-1]=-km; # contribution de noeud (i,j+1)
+                    pc=(i-1)*Nx+j+1;M[pl-1,pc-1]=km; # contribution de noeud (i,j+1)
+                    b[pl-1]=Tp
+                    
                     
                 if (i == i_mur) and ( Nx - j_mur > j > j_mur) :
                     #print("3e valeur de ij",'i=',i,'j=',j)
-                    pc=pl;M[pl-1,pc-1]=-2*(km+ka); # contribution de noeud (i,j)
-                    pc=(i-2)*Nx+j;M[pl-1,pc-1]=-km; # contribution de noeud (i-1,j)
+                    pc=pl;M[pl-1,pc-1]=-4*(km+ka); # contribution de noeud (i,j)
+                    pc=(i-2)*Nx+j;M[pl-1,pc-1]=km; # contribution de noeud (i-1,j)
                     pc=(i)*Nx+j;M[pl-1,pc-1]=ka; # contribution de noeud (i+1,j)
+                    b[pl-1]=Tp
 
                 if (i == Ny-i_mur)  and (j_mur <j < Nx - j_mur):
                     #print("4e valeur de ij",'i=',i,'j=',j)
-                    pc=pl;M[pl-1,pc-1]=-2*(km+ka); # contribution de noeud (i,j)
+                    pc=pl;M[pl-1,pc-1]=-4*(km+ka); # contribution de noeud (i,j)
                     pc=(i-2)*Nx+j;M[pl-1,pc-1]=ka; # contribution de noeud (i-1,j)
-                    pc=(i)*Nx+j;M[pl-1,pc-1]= -km; # contribution de noeud (i+1,j)
+                    pc=(i)*Nx+j;M[pl-1,pc-1]= km; # contribution de noeud (i+1,j)
+                    b[pl-1]=Tp
                     
                             # ######JAI MODIFIER ICI  (fifn)
 ##################Jai modifier ici (Debut)
@@ -210,7 +221,9 @@ for fact in fact_ar:
     tini_ar[ci]=(toc-tic)/1.0e9; #temps en [s]  
     
     tic=time.time_ns()
-    T=np.linalg.solve(M,b)
+    #T=np.linalg.solve(M,b)
+    M = M.tocsr()
+    T=scipy.sparse.linalg.spsolve(M, b)
     toc=time.time_ns()
     tinv_ar[ci]=(toc-tic)/1.0e9; #temps en [s]  
     
@@ -221,6 +234,7 @@ for fact in fact_ar:
     Tm_ar[ci]=Tr[int(np.rint(Ly/d/2+1))-1,int(np.rint(Lx/d/2+1))-1]; # température au milieu du domaine de calcul
 
 #print("truc des axes des figure",np.arange(0,Nx,1)*d)
+print("Tr",Tr)
 print("Tm_ar",Tm_ar)
 
 plt.figure(1)
@@ -229,7 +243,7 @@ plt.colorbar(mappable=None, cax=None, ax=None)
 plt.title('S(x,y) [W/$m^3$]')
 plt.xlabel('x [m]')    
 plt.ylabel('y [m]')
-plt.show()
+
 
 plt.figure(2)
 plt.pcolor(np.arange(0,Nx,1)*d,np.arange(0,Ny,1)*d,k)
@@ -237,7 +251,7 @@ plt.colorbar(mappable=None, cax=None, ax=None)
 plt.title('k(x,y) [W/($m^2\cdot$K)]')
 plt.xlabel('x [m]')    
 plt.ylabel('y [m]')
-plt.show()
+
 
 plt.figure(3)
 plt.pcolor(np.arange(0,Nx,1)*d,np.arange(0,Ny,1)*d,Tr)
@@ -245,7 +259,6 @@ plt.colorbar(mappable=None, cax=None, ax=None)
 plt.title('T(x,y) [$^o$C]')
 plt.xlabel('x [m]')    
 plt.ylabel('y [m]')
-plt.show()
 
 plt.figure(4)
 plt.loglog(d_ar[::-1],mem_ar[::-1]/1024.0**3,'-o')
