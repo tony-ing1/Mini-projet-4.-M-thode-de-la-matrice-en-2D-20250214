@@ -126,8 +126,9 @@ for fact in fact_ar:
                     pc=pl;M[pl-1,pc-1]=-4*(km+ka); # contribution de noeud (i,j)
                     pc=(i-1)*Nx+j-1;M[pl-1,pc-1]=km; # contribution de noeud (i,j-1)
                     pc=(i-1)*Nx+j+1;M[pl-1,pc-1]=ka; # contribution de noeud (i,j+1)
-                    #pc=(i-2)*Nx+j;M[pl-1,pc-1]=(km+ka)/2; # contribution de noeud (i-1,j)
-                    #pc=(i)*Nx+j;M[pl-1,pc-1]=(km+ka)/2; # contribution de noeud (i+1,j)
+                    "Il faut rajouter les éléments pour les autres noeuds voisin je sais pas si c'est bon"
+                    #pc=(i-2)*Nx+j;M[pl-1,pc-1]=ka; # contribution de noeud (i-1,j)
+                    #pc=(i)*Nx+j;M[pl-1,pc-1]=km; # contribution de noeud (i+1,j)
                     b[pl-1]=0
                 
                     #Contion du flux de chaleur sur la surfaces intérieures à x = Lx-Lm
@@ -136,6 +137,9 @@ for fact in fact_ar:
                     pc=pl;M[pl-1,pc-1]=-4*(km+ka); # contribution de noeud (i,j)
                     pc=(i-1)*Nx+j-1;M[pl-1,pc-1]=ka; # contribution de noeud (i,j-1)
                     pc=(i-1)*Nx+j+1;M[pl-1,pc-1]=km; # contribution de noeud (i,j+1)
+                    "Il faut rajouter les éléments pour les autres noeuds voisin"
+                    #pc=(i-1)*Nx+j-1;M[pl-1,pc-1]=km; # contribution de noeud (i,j-1)
+                    #pc=(i-1)*Nx+j+1;M[pl-1,pc-1]=ka; # contribution de noeud (i,j+1)
                     b[pl-1]=0
                     
                     
@@ -144,6 +148,9 @@ for fact in fact_ar:
                     pc=pl;M[pl-1,pc-1]=-4*(km+ka); # contribution de noeud (i,j)
                     pc=(i-2)*Nx+j;M[pl-1,pc-1]=km; # contribution de noeud (i-1,j)
                     pc=(i)*Nx+j;M[pl-1,pc-1]=ka; # contribution de noeud (i+1,j)
+                    "Il faut rajouter les éléments pour les autres noeuds voisin"
+                    #pc=(i-1)*Nx+j-1;M[pl-1,pc-1]=km; # contribution de noeud (i,j-1)
+                    #pc=(i-1)*Nx+j+1;M[pl-1,pc-1]=ka; # contribution de noeud (i,j+1)
                     b[pl-1]=0
 
                 if (i == Ny-i_mur)  and (j_mur <j < Nx - j_mur):
@@ -151,6 +158,9 @@ for fact in fact_ar:
                     pc=pl;M[pl-1,pc-1]=-4*(km+ka); # contribution de noeud (i,j)
                     pc=(i-2)*Nx+j;M[pl-1,pc-1]=ka; # contribution de noeud (i-1,j)
                     pc=(i)*Nx+j;M[pl-1,pc-1]= km; # contribution de noeud (i+1,j)
+                    "Il faut rajouter les éléments pour les autres noeuds voisin"
+                    #pc=(i-2)*Nx+j;M[pl-1,pc-1]=ka; # contribution de noeud (i,j-1)
+                    #pc=(i)*Nx+j;M[pl-1,pc-1]=km; # contribution de noeud (i,j+1)
                     b[pl-1]=0
                     
                             # ######JAI MODIFIER ICI  (fifn)
