@@ -108,8 +108,8 @@ for fact in fact_ar:
             j_mur_fin = int(np.rint((Lm-0.2)/d))
             #print("Truc indice",j_mur)
             #j_fin_mur = int(np.rint((Lx - Lm) / d))
-            i_mur = int(np.rint((Lm-0.2)/d))
-            i_mur_fin = int(np.rint((Lm-0.2)/d))
+            i_mur = int(np.rint((Lm)/d))
+            i_mur_fin = int(np.rint((Lm)/d))
             #i_fin_mur = int(np.rint((Ly - Lm) / d))
 
             if (((i>1) and (i<Ny)) and ((j>1) and (j<Nx))):
